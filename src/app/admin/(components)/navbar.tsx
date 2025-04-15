@@ -3,9 +3,8 @@
 import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
-import { clsx } from "clsx"
 import { motion } from "framer-motion"
-import { Close, Menu, Notifications, Search } from "../global/icons"
+import { Menu, Notifications } from "@/components/global/icons"
 
 const dropdownLinks = [
  { label: "Profile", href: "/" },
@@ -28,16 +27,12 @@ const containerVariants = {
  }
 }
 
-export default function Navbar() {
- const [sidebarOpen, setSidebarOpen] = useState(false)
+export default function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
  const [dropdownOpen, setDropdownOpen] = useState(false)
- const [searchOpen, setSearchOpen] = useState(false)
 
  const dropdownRef = useRef<HTMLDivElement>(null)
- const inputRef = useRef<HTMLInputElement>(null)
 
  const toggleDropdown = () => setDropdownOpen(!dropdownOpen)
- const toggleSearch = () => setSearchOpen(!searchOpen)
 
  useEffect(() => {
   const handleClick = (e: MouseEvent) => {
@@ -53,15 +48,6 @@ export default function Navbar() {
   return () => document.removeEventListener("mousedown", handleClick)
  }, [])
 
- useEffect(() => {
-  if (
-   searchOpen &&
-   inputRef.current
-  ) {
-   inputRef.current.focus()
-  }
- }, [searchOpen])
-
  return (
   <motion.nav
    initial="hidden"
@@ -71,8 +57,8 @@ export default function Navbar() {
    <div className="flex items-center justify-center gap-4 px-4 py-2">
     <div className="flex items-center gap-2 flex-1">
      <button
-      onClick={() => setSidebarOpen(!sidebarOpen)}
-      aria-label="Toggle sidebar"
+      onClick={onMenuClick}
+      aria-label="Toggle navrail"
       className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer"
      >
       <Menu />
@@ -89,42 +75,9 @@ export default function Navbar() {
       <span className="text-slate-700 hidden lg:block">UT Health San Antonio</span>
      </Link>
     </div>
-    <div className="flex max-w-lg w-full relative">
-     <div className="hidden w-full lg:flex">
-      <input
-       type="text"
-       placeholder="Search"
-       className="w-full relative border border-slate-200 rounded-md px-4 pl-10 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500"
-      />
-      <Search className="text-slate-500 absolute inset-y-2 left-2 flex items-center pointer-events-none" />
-     </div>
-     <div className="flex items-center justify-end gap-2 lg:hidden w-full">
-      <div
-       className={`transition-all duration-300 ease-in-out ${
-        searchOpen ? "w-full opacity-100" : "w-0 opacity-0"
-       }`}
-      >
-       <input
-        type="text"
-        ref={inputRef}
-        placeholder="Search"
-        className="border border-slate-200 rounded-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-slate-500"
-       />
-      </div>
-      <button
-       onClick={toggleSearch}
-       aria-label="Toggle search bar"
-       className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer relative z-30"
-      >
-       <Search />
-      </button>
-     </div>
-    </div>
+    <div></div>
     <div className="flex items-center justify-end gap-4 flex-1">
-     <button
-      aria-label="Toggle notifications"
-      className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer hidden lg:flex relative"
-     >
+     <button aria-label="Toggle notifications" className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer hidden lg:flex relative">
       <Notifications />
       <span className="flex items-center justify-center text-white text-xs w-4 h-4 bg-orange-700 absolute top-0 right-0 rounded-full">3</span>
      </button>
@@ -140,7 +93,7 @@ export default function Navbar() {
         width={30}
         height={30}
         priority
-        className="rounded-full flex"
+        className="rounded-full"
        />
       </button>
       {dropdownOpen && (
@@ -157,29 +110,6 @@ export default function Navbar() {
      </div>
     </div>
    </div>
-   <div
-    className={clsx(
-     "fixed top-0 left-0 h-screen w-64 bg-white shadow-lg transform transition-transform duration-300 z-40",
-     sidebarOpen ? "translate-x-0" : "-translate-x-full"
-    )}
-   >
-    <div className="flex items-center justify-end p-2">
-     <button
-      onClick={() => setSidebarOpen(false)}
-      aria-label="Close sidebar"
-      className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer"
-     >
-      <Close />
-     </button>
-    </div>
-    <ul></ul>
-   </div>
-   {sidebarOpen && (
-    <div
-     onClick={() => setSidebarOpen(false)}
-     className="fixed inset-0 bg-black opacity-60 z-30"
-    />
-   )}
   </motion.nav>
  )
 }
