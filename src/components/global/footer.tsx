@@ -8,7 +8,7 @@ const links = [
 
 export default function Footer() {
  return (
-  <footer className="flex flex-col items-center justify-center gap-2 py-8 border-t border-slate-200">
+  <footer className="hidden lg:flex flex-col items-center justify-center gap-2 py-8 border-t border-slate-200">
    <Link href={"/"} className="mb-2">
     <Image
      src="/logo.png"

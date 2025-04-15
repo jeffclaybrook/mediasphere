@@ -11,7 +11,7 @@ const Checkbox: FC<CheckboxProps> = ({ checked, onChange, id }) => {
  const handleToggle = () => onChange(!checked)
 
  return (
-  <label htmlFor={id}>
+  <label htmlFor={id} className="text-slate-700 cursor-pointer">
    <input
     id={id}
     type="checkbox"
@@ -20,9 +20,9 @@ const Checkbox: FC<CheckboxProps> = ({ checked, onChange, id }) => {
     className="sr-only"
    />
    {checked ? (
-    <CheckboxChecked className="text-slate-700" />
+    <CheckboxChecked />
    ) : (
-    <CheckboxUnchecked className="text-slate-700" />
+    <CheckboxUnchecked />
    )}
   </label>
  )

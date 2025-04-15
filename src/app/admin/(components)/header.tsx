@@ -44,7 +44,7 @@ export default function Header() {
     initial="hidden"
     animate="visible"
     variants={containerVariants}
-    className="px-4"
+    className="lg:px-4"
    >
     <Image
      src={image}
@@ -52,7 +52,7 @@ export default function Header() {
      width={1500}
      height={250}
      priority
-     className="rounded-2xl"
+     className="lg:rounded-2xl"
     />
    </motion.header>
   )

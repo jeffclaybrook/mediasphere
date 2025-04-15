@@ -68,7 +68,7 @@ export default function Navbar() {
    animate="visible"
    variants={containerVariants}
   >
-   <div className="flex items-center justify-center gap-4 px-4 py-2">
+   <div className="flex items-center justify-center gap-4 lg:px-5 px-4 py-2">
     <div className="flex items-center gap-2 flex-1">
      <button
       onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -172,7 +172,9 @@ export default function Navbar() {
       <Close />
      </button>
     </div>
-    <ul></ul>
+    <ul className="p-2">
+     <li className="text-slate-700 text-sm">Still trying to figure out what goes here LMAO</li>
+    </ul>
    </div>
    {sidebarOpen && (
     <div

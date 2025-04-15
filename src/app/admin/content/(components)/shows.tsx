@@ -4,7 +4,7 @@ import { useState } from "react"
 import { format } from "date-fns"
 import { ArrowDown, ArrowUp, Draft, More, Published } from "@/components/global/icons"
 import Image from "next/image"
-import Checkbox from "./checkbox"
+import Checkbox from "../../(components)/checkbox"
 
 type VideoData = {
  id: string
@@ -117,11 +117,7 @@ export default function Shows() {
  const [data, setData] = useState<VideoData[]>(videoData)
 
  const toggleSelectAll = () => {
-  if (selected.length === data.length) {
-   setSelected([])
-  } else {
-   setSelected(data.map((d) => d.id))
-  }
+  setSelected(selected.length === data.length ? [] : data.map((d) => d.id))
  }
 
  const toggleSelect = (id: string) => {
@@ -130,13 +126,10 @@ export default function Shows() {
 
  const sortBy = (key: SortKey) => {
   let direction: "asc" | "desc" = "asc"
-
   if (
    sortConfig?.key === key &&
    sortConfig.direction === "asc"
-  ) {
-   direction = "desc"
-  }
+  ) direction = "desc"
 
   const sorted = [...data].sort((a, b) => {
    if (key === "date") {
@@ -144,7 +137,9 @@ export default function Shows() {
      ? new Date(a.date).getTime() - new Date(b.date).getTime()
      : new Date(b.date).getTime() - new Date(a.date).getTime()
    } else if (typeof a[key] === "number") {
-    return direction === "asc" ? (a[key] as number) - (b[key] as number) : (b[key] as number) - (a[key] as number)
+    return direction === "asc"
+     ? (a[key] as number) - (b[key] as number)
+     : (b[key] as number) - (a[key] as number)
    } else {
     return direction === "asc"
      ? (a[key] as string).localeCompare(b[key] as string)
@@ -158,90 +153,86 @@ export default function Shows() {
 
  const renderSortIcon = (key: SortKey) => {
   if (sortConfig?.key !== key) return null
-  return sortConfig.direction === "asc" ? <ArrowUp className="inline" /> : <ArrowDown className="inline" />
+  return sortConfig.direction === "asc"
+   ? <ArrowUp className="text-slate-700" />
+   : <ArrowDown className="text-slate-700" />
  }
 
+ const columns = [
+  { label: "Video", className: "max-w-lg w-full", key: "title" as SortKey },
+  { label: "Visibility", className: "hidden lg:flex flex-1 w-32" },
+  { label: "Date", className: "hidden lg:flex flex-1 w-32", key: "date" as SortKey },
+  { label: "Views", className: "hidden lg:flex flex-1 w-24", key: "views" as SortKey },
+  { label: "Comments", className: "hidden lg:flex flex-1 w-24", key: "comments" as SortKey },
+  { label: "Actions", className: "hidden lg:flex flex-1 w-24" }
+ ]
+
  return (
-  <table className="w-full">
-   <thead className="border-b border-slate-200 w-full">
-    <tr>
-     <th className="p-3 text-start">
-      <Checkbox
-       checked={selected.length === data.length}
-       onChange={toggleSelectAll}
-      />
-     </th>
-     <th
-      onClick={() => sortBy("title")}
-      className="py-3 text-start cursor-pointer text-slate-500 text-sm font-medium"
+  <div className="w-full">
+   <div className="flex items-center gap-2 px-4 py-2 border-b border-slate-200">
+    <div className="px-2">
+     <Checkbox
+      checked={selected.length === data.length}
+      onChange={toggleSelectAll}
+     />
+    </div>
+    {columns.map((column, i) => (
+     <div
+      key={i}
+      onClick={() => column.key && sortBy(column.key)}
+      className={`flex items-center gap-1 px-2 text-slate-500 text-sm font-medium ${column.className} ${column.key ? "cursor-pointer select-none" : ""}`}
      >
-      Video {renderSortIcon("title")}
-     </th>
-     <th className="py-3 text-start text-slate-500 text-sm font-medium">Visibility</th>
-     <th
-      onClick={() => sortBy("date")}
-      className="py-3 text-start cursor-pointer text-slate-500 text-sm font-medium"
-     >
-      Date {renderSortIcon("date")}
-     </th>
-     <th
-      onClick={() => sortBy("views")}
-      className="py-3 text-start cursor-pointer text-slate-500 text-sm font-medium"
-     >
-      Views {renderSortIcon("views")}
-     </th>
-     <th
-      onClick={() => sortBy("comments")}
-      className="py-3 text-start cursor-pointer text-slate-500 text-sm font-medium"
-     >
-      Comments {renderSortIcon("comments")}
-     </th>
-     <th className="py-3 text-start text-slate-500 text-sm font-medium">Actions</th>
-    </tr>
-   </thead>
-   <tbody className="divide-y divide-slate-200">
-    {data.map((item) => (
-     <tr key={item.id} className="hover:bg-slate-100">
-      <td className="p-3">
-       <Checkbox
-        checked={selected.includes(item.id)}
-        onChange={() => toggleSelect(item.id)}
-       />
-      </td>
-      <td className="py-3 flex items-center gap-4">
-       <div className="relative">
-        <Image
-         src={item.image}
-         alt={item.title}
-         width={150}
-         height={100}
-         className="rounded-md"
-        />
-        <span className="absolute bottom-1 left-25 bg-black/70 text-white/90 text-xs text-center font-medium px-2 py-[2px] rounded-sm">{item.duration}</span>
-       </div>
-       <div>
-        <h3 className="text-slate-700 font-medium text-sm line-clamp-1 max-w-sm">{item.title}</h3>
-        <p className="text-slate-500 text-xs line-clamp-2 max-w-sm">{item.description}</p>
-       </div>
-      </td>
-      <td className="py-3 text-slate-700">
-       {item.visibility === "Published" ? <Published className="inline align-middle mr-1" /> : <Draft className="inline align-middle mr-1" />}
-       <span className="text-sm">{item.visibility}</span>
-      </td>
-      <td className="py-3 text-slate-700 text-sm">{format(new Date(item.date), "MMM dd, yyyy")}</td>
-      <td className="py-3 text-slate-700 text-sm">{item.views.toLocaleString()}</td>
-      <td className="py-3 text-slate-700 text-sm">{item.comments}</td>
-      <td className="py-3 text-slate-700 text-sm">
-       <button
-        aria-label="More"
-        className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer"
-       >
-        <More />
-       </button>
-      </td>
-     </tr>
+      {column.label}
+      {column.key && renderSortIcon(column.key)}
+     </div>
     ))}
-   </tbody>
-  </table>
+   </div>
+   {data.map((video) => (
+    <div
+     key={video.id}
+     className={`flex items-center gap-2 px-4 py-2 hover:bg-slate-100 border-b border-slate-200 ${
+      selected.includes(video.id) ? "bg-slate-100" : "bg-white"
+     }`}
+    >
+     <div className="px-2 w-[40px]">
+      <Checkbox
+       checked={selected.includes(video.id)}
+       onChange={() => toggleSelect(video.id)}
+      />
+     </div>
+     <div className="flex items-center gap-4 max-w-lg w-full px-2">
+      <div className="relative shrink-0">
+       <Image
+        src={video.image}
+        alt={video.title}
+        width={125}
+        height={75}
+        className="rounded-md"
+       />
+       <span className="absolute bottom-1 right-1 bg-black/70 text-white/90 text-xs text-center font-medium px-2 py-[2px] rounded-sm">{video.duration}</span>
+      </div>
+      <div>
+       <h3 className="text-slate-700 font-medium text-sm line-clamp-1 max-w-md">{video.title}</h3>
+       <p className="text-slate-500 text-xs line-clamp-2 max-w-md">{video.description}</p>
+      </div>
+     </div>
+     <div className="hidden lg:flex items-center gap-2 flex-1 px-2 w-32 text-slate-700 text-sm">
+      {video.visibility === "Published" ? <Published /> : <Draft />}
+      {video.visibility}
+     </div>
+     <div className="hidden lg:flex px-2 w-32 text-slate-700 text-sm flex-1">{format(new Date(video.date), "MMM dd, yyyy")}</div>
+     <div className="hidden lg:flex px-2 w-24 text-slate-700 text-sm flex-1">{video.views.toLocaleString()}</div>
+     <div className="hidden lg:flex px-2 w-24 text-sm text-slate-700 flex-1">{video.comments}</div>
+     <div className="hidden lg:flex px-2 w-24 flex-1">
+      <button
+       aria-label="More"
+       className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer"
+      >
+       <More />
+      </button>
+     </div>
+    </div>
+   ))}
+  </div>
  )
 }

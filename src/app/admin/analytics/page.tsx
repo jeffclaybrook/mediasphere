@@ -1,10 +1,30 @@
-import Header from "../(components)/header"
+"use client"
+
+import { motion } from "framer-motion"
+
+const containerVariants = {
+ hidden: {
+  opacity: 0,
+  y: 20
+ },
+ visible: {
+  opacity: 1,
+  y: 0,
+  transition: {
+   duration: 1,
+   ease: "easeInOut"
+  }
+ }
+}
 
 export default function Analytics() {
  return (
-  <>
-   <Header />
-   <main className="p-4">Analytics</main>
-  </>
+  <motion.main
+   initial="hidden"
+   animate="visible"
+   variants={containerVariants}
+  >
+   <section className="p-4">Analytics</section>
+  </motion.main>
  )
 }

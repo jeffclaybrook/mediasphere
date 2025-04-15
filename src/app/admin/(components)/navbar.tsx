@@ -49,17 +49,17 @@ export default function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
  }, [])
 
  return (
-  <motion.nav
+  <motion.div
    initial="hidden"
    animate="visible"
    variants={containerVariants}
   >
-   <div className="flex items-center justify-center gap-4 px-4 py-2">
+   <div className="flex items-center justify-center gap-4 lg:px-5 px-4 py-2">
     <div className="flex items-center gap-2 flex-1">
      <button
       onClick={onMenuClick}
       aria-label="Toggle navrail"
-      className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer"
+      className="hidden lg:block text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer"
      >
       <Menu />
      </button>
@@ -110,6 +110,6 @@ export default function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
      </div>
     </div>
    </div>
-  </motion.nav>
+  </motion.div>
  )
 }
