@@ -267,7 +267,7 @@ export default function Shows() {
  ]
 
  return (
-  <div className="w-full">
+  <div className="w-full pb-8">
    <div className="flex items-center gap-2 px-4 py-2 border-b border-slate-200">
     <div className="px-2">
      <Checkbox
