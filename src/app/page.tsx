@@ -30,7 +30,7 @@ const sections = [
  { label: "Professional Development", key: "professionalDeveloment", content: professionalDevelopment }
 ]
 
-const chunkSize = 5
+const chunkSize = 4
 
 export default function Home() {
  const [image, setImage] = useState("/banner-desktop.png")
@@ -135,7 +135,7 @@ export default function Home() {
         <span className="flex w-12 h-[2px] bg-orange-700 rounded-full" />
         {section.label}
        </h2>
-       <ul className="grid md:grid-cols-2 lg:grid-cols-5 gap-4 gap-y-8 mb-4">
+       <ul className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 gap-y-8 mb-4">
         <AnimatePresence initial={false}>
          {visibleItems.map((item, i) => {
           const isNew = i >= lastStart && i < lastStart + chunkSize
@@ -149,7 +149,7 @@ export default function Home() {
               height={250}
               className="rounded-md"
              />
-             <span className="absolute bottom-2 right-2 bg-black/70 text-white/90 text-xs text-center font-medium px-2 py-[2px] rounded-sm">{item.duration}</span>
+             <span className="absolute bottom-2 right-2 bg-black/70 text-white/90 text-xs text-center font-medium px-1 py-[2px] rounded-sm">{item.duration}</span>
             </div>
             <div className="flex flex-col">
              <div className="flex items-start justify-between gap-4 mb-1">

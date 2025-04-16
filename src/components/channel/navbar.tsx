@@ -69,7 +69,7 @@ export default function Navbar() {
    variants={containerVariants}
   >
    <div className="flex items-center justify-center gap-4 lg:px-5 px-4 py-2">
-    <div className="flex items-center gap-2 flex-1">
+    <div className="flex items-center gap-2 lg:flex-1">
      <button
       onClick={() => setSidebarOpen(!sidebarOpen)}
       aria-label="Toggle sidebar"
@@ -77,7 +77,7 @@ export default function Navbar() {
      >
       <Menu />
      </button>
-     <Link href={"/"} className="flex items-center gap-2">
+     <Link href={"/"} className="flex items-center gap-2 shrink-0">
       <Image
        src="/shield-logo.png"
        alt="UT Health San Antonio logo"
@@ -89,38 +89,32 @@ export default function Navbar() {
       <span className="text-slate-700 hidden lg:block">UT Health San Antonio</span>
      </Link>
     </div>
-    <div className="flex max-w-lg w-full relative">
-     <div className="hidden w-full lg:flex">
+    <div className="hidden lg:flex max-w-lg w-full relative">
+     <input
+      type="text"
+      placeholder="Search"
+      className="w-full border border-slate-200 rounded-md px-4 pl-10 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500"
+     />
+     <Search className="text-slate-500 absolute inset-y-[9px] left-2 pointer-events-none" />
+    </div>
+    <div className="flex items-center justify-end gap-4 flex-1">
+     <div className="flex items-center justify-center gap-2 w-full lg:hidden">
       <input
        type="text"
        placeholder="Search"
-       className="w-full relative border border-slate-200 rounded-md px-4 pl-10 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500"
-      />
-      <Search className="text-slate-500 absolute inset-y-2 left-2 flex items-center pointer-events-none" />
-     </div>
-     <div className="flex items-center justify-end gap-2 lg:hidden w-full">
-      <div
-       className={`transition-all duration-300 ease-in-out ${
+       ref={inputRef}
+       className={`transition-all duration-300 ease-in-out border border-slate-200 rounded-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-slate-500 ${
         searchOpen ? "w-full opacity-100" : "w-0 opacity-0"
        }`}
-      >
-       <input
-        type="text"
-        ref={inputRef}
-        placeholder="Search"
-        className="border border-slate-200 rounded-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-slate-500"
-       />
-      </div>
+      />
       <button
        onClick={toggleSearch}
        aria-label="Toggle search bar"
-       className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer relative z-30"
+       className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer"
       >
        <Search />
       </button>
      </div>
-    </div>
-    <div className="flex items-center justify-end gap-4 flex-1">
      <button
       aria-label="Toggle notifications"
       className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer hidden lg:flex relative"
@@ -132,7 +126,7 @@ export default function Navbar() {
       <button
        onClick={toggleDropdown}
        aria-label="Toggle dropdown"
-       className="rounded-full cursor-pointer"
+       className="rounded-full cursor-pointer shrink-0"
       >
        <Image
         src="/avatar.png"

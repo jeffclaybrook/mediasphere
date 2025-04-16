@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { format } from "date-fns"
-import { ArrowUp, ArrowDown, Category, More, Private, Public } from "@/components/global/icons"
+import { ArrowUp, ArrowDown, Category, ChevronLeft, ChevronRight, More, Private, Public } from "@/components/global/icons"
 import Image from "next/image"
 import Checkbox from "../../(components)/checkbox"
 
@@ -89,6 +89,78 @@ const categoryData: CategoryData[] = [
   lastUpdated: "Feb 28, 2025",
   views: 2317
  },
+ {
+  id: "9",
+  category: "Dentistry",
+  image: "/thumbnail-1.png",
+  shows: 11,
+  visibility: "Public",
+  lastUpdated: "Mar 28, 2025",
+  views: 1675
+ },
+ {
+  id: "10",
+  category: "Physicians",
+  image: "/thumbnail-2.png",
+  shows: 27,
+  visibility: "Private",
+  lastUpdated: "Mar 25, 2025",
+  views: 4164
+ },
+ {
+  id: "11",
+  category: "Academics",
+  image: "/thumbnail-3.png",
+  shows: 18,
+  visibility: "Public",
+  lastUpdated: "Mar 22, 2025",
+  views: 2174
+ },
+ {
+  id: "12",
+  category: "Patient Care",
+  image: "/thumbnail-4.png",
+  shows: 7,
+  visibility: "Private",
+  lastUpdated: "Mar 18, 2025",
+  views: 837
+ },
+ {
+  id: "13",
+  category: "Certificate Programs",
+  image: "/thumbnail-5.png",
+  shows: 41,
+  visibility: "Private",
+  lastUpdated: "Mar 11, 2025",
+  views: 5282
+ },
+ {
+  id: "14",
+  category: "Physical Therapy",
+  image: "/thumbnail-6.png",
+  shows: 32,
+  visibility: "Public",
+  lastUpdated: "Mar 5, 2025",
+  views: 3074
+ },
+ {
+  id: "15",
+  category: "Veterans Portal",
+  image: "/thumbnail-7.png",
+  shows: 11,
+  visibility: "Public",
+  lastUpdated: "Mar 1, 2025",
+  views: 1675
+ },
+ {
+  id: "16",
+  category: "Biomedical Sciences",
+  image: "/thumbnail-8.png",
+  shows: 21,
+  visibility: "Public",
+  lastUpdated: "Feb 28, 2025",
+  views: 2317
+ }
 ]
 
 type SortKey = keyof Pick<CategoryData, "category" | "lastUpdated" | "views" | "shows">
@@ -96,7 +168,17 @@ type SortKey = keyof Pick<CategoryData, "category" | "lastUpdated" | "views" | "
 export default function CategoriesList() {
  const [selected, setSelected] = useState<string[]>([])
  const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: "asc" | "desc" } | null>(null)
+ const [currentPage, setCurrentPage] = useState(1)
  const [data, setData] = useState<CategoryData[]>(categoryData)
+
+ const itemsPerPage = 10
+
+ const totalPages = Math.ceil(data.length / itemsPerPage)
+
+ const paginatedData = data.slice(
+  (currentPage -1) * itemsPerPage,
+  currentPage * itemsPerPage
+ )
 
  const toggleSelectAll = () => {
   setSelected(selected.length === data.length ? [] : data.map((d) => d.id))
@@ -131,10 +213,11 @@ export default function CategoriesList() {
 
   setData(sorted)
   setSortConfig({ key, direction })
+  setCurrentPage(1)
  }
 
  const renderSortIcon = (key: SortKey) => {
-  if (sortConfig?.key !== key) return null
+  if (sortConfig?.key !== key) return <ArrowUp />
   return sortConfig.direction === "asc"
    ? <ArrowUp className="text-slate-700" />
    : <ArrowDown className="text-slate-700" />
@@ -142,11 +225,11 @@ export default function CategoriesList() {
 
  const columns = [
   { label: "Category", className: "w-full max-w-md", key: "category" as SortKey },
-  { label: "Visibility", className: "hidden lg:block flex-1 w-32" },
-  { label: "Last updated", className: "hidden lg:block flex-1 w-32", key: "lastUpdated" as SortKey },
-  { label: "Shows", className: "hidden lg:block flex-1 w-24", key: "shows" as SortKey },
-  { label: "Views", className: "hidden lg:block flex-1 w-24", key: "views" as SortKey },
-  { label: "Actions", className: "hidden lg:block flex-1 w-24" }
+  { label: "Visibility", className: "hidden lg:flex flex-1 w-32" },
+  { label: "Last updated", className: "hidden lg:flex flex-1 w-32", key: "lastUpdated" as SortKey },
+  { label: "Shows", className: "hidden lg:flex flex-1 w-24", key: "shows" as SortKey },
+  { label: "Views", className: "hidden lg:flex flex-1 w-24", key: "views" as SortKey },
+  { label: "Actions", className: "hidden lg:flex flex-1 w-24" }
  ]
 
  return (
@@ -169,7 +252,7 @@ export default function CategoriesList() {
      </div>
     ))}
    </div>
-   {data.map((category) => (
+   {paginatedData.map((category) => (
     <div
      key={category.id}
      className={`flex items-center gap-2 px-4 py-2 hover:bg-slate-100 border-b border-slate-200 ${
@@ -217,6 +300,23 @@ export default function CategoriesList() {
      </div>
     </div>
    ))}
+   <div className="flex items-center justify-center gap-4 mt-4">
+    <button
+      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+      disabled={currentPage === 1}
+      className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer disabled:opacity-50 disabled:cursor-default"
+    >
+      <ChevronLeft />
+    </button>
+    <span className="text-slate-700 text-sm">Page {currentPage} of {totalPages}</span>
+    <button
+      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+      disabled={currentPage === totalPages}
+      className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer disabled:opacity-50 disabled:cursor-default"
+    >
+      <ChevronRight />
+    </button>
+   </div>
   </div>
  )
 }

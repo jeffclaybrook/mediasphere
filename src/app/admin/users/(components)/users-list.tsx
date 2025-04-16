@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { format } from "date-fns"
-import { ArrowUp, ArrowDown, More } from "@/components/global/icons"
+import { ArrowUp, ArrowDown, ChevronLeft, ChevronRight, More } from "@/components/global/icons"
 import Checkbox from "../../(components)/checkbox"
 
 type UsersData = {
@@ -53,7 +53,7 @@ const usersData: UsersData[] = [
   id: "6",
   name: "Andrew Argubright",
   role: "Viewer",
-  email: "adam@mediasphere.com",
+  email: "andrew@mediasphere.com",
   lastActivity: "Mar 28, 2025"
  },
  {
@@ -122,7 +122,17 @@ type SortKey = keyof Pick<UsersData, "name" | "role" | "email" | "lastActivity">
 export default function UsersList() {
  const [selected, setSelected] = useState<string[]>([])
  const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: "asc" | "desc" } | null>(null)
+ const [currentPage, setCurrentPage] = useState(1)
  const [data, setData] = useState<UsersData[]>(usersData)
+
+ const itemsPerPage = 10
+
+ const totalPages = Math.ceil(data.length / itemsPerPage)
+
+ const paginatedData = data.slice(
+  (currentPage - 1) * itemsPerPage,
+  currentPage * itemsPerPage
+ )
 
  const toggleSelectAll = () => {
   setSelected(selected.length === data.length ? [] : data.map((d) => d.id))
@@ -157,10 +167,11 @@ export default function UsersList() {
 
   setData(sorted)
   setSortConfig({ key, direction })
+  setCurrentPage(1)
  }
 
  const renderSortIcon = (key: SortKey) => {
-  if (sortConfig?.key !== key) return null
+  if (sortConfig?.key !== key) return <ArrowUp />
   return sortConfig.direction === "asc"
    ? <ArrowUp className="text-slate-700" />
    : <ArrowDown className="text-slate-700" />
@@ -168,10 +179,10 @@ export default function UsersList() {
 
  const columns = [
   { label: "Name", className: "w-full max-w-sm", key: "name" as SortKey },
-  { label: "Role", className: "hidden lg:block flex-1 w-24", key: "role" as SortKey },
-  { label: "Email", className: "hidden lg:block flex-1 w-24", key: "email" as SortKey },
-  { label: "Last activity", className: "hidden lg:block flex-1 w-32", key: "lastActivity" as SortKey },
-  { label: "Actions", className: "hidden lg:block flex-1 w-24" }
+  { label: "Role", className: "hidden lg:flex flex-1 w-24", key: "role" as SortKey },
+  { label: "Email", className: "hidden lg:flex flex-1 w-24", key: "email" as SortKey },
+  { label: "Last activity", className: "hidden lg:flex flex-1 w-32", key: "lastActivity" as SortKey },
+  { label: "Actions", className: "hidden lg:flex flex-1 w-24" }
  ]
 
  return (
@@ -194,7 +205,7 @@ export default function UsersList() {
      </div>
     ))}
    </div>
-   {data.map((user) => {
+   {paginatedData.map((user) => {
     const initials = getInitials(user.name)
     const avatarColor = getRandomColor(user.name)
     return (
@@ -211,7 +222,7 @@ export default function UsersList() {
        />
       </div>
       <div className="flex items-center gap-4 max-w-sm w-full px-2">
-       <span className="flex items-center justify-center shrink-0 h-8 w-8 rounded-full text-white text-sm" style={{ backgroundColor: avatarColor }}>{initials}</span>
+       <span className="flex items-center justify-center shrink-0 h-10 w-10 rounded-full text-white text-sm" style={{ backgroundColor: avatarColor }}>{initials}</span>
        <h3 className="text-slate-700 text-sm font-medium">{user.name}</h3>
       </div>
       <div className="hidden lg:flex px-2 flex-1 w-24 text-slate-700 text-sm">{user.role}</div>
@@ -225,6 +236,23 @@ export default function UsersList() {
      </div>
     )
    })}
+   <div className="flex items-center justify-center gap-4 mt-4">
+    <button
+      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+      disabled={currentPage === 1}
+      className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer disabled:opacity-50 disabled:cursor-default"
+    >
+      <ChevronLeft />
+    </button>
+    <span className="text-slate-700 text-sm">Page {currentPage} of {totalPages}</span>
+    <button
+      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+      disabled={currentPage === totalPages}
+      className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer disabled:opacity-50 disabled:cursor-default"
+    >
+      <ChevronRight />
+    </button>
+   </div>
   </div>
  )
 }

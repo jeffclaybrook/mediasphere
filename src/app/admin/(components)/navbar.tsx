@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { motion } from "framer-motion"
-import { Menu, Notifications } from "@/components/global/icons"
+import { Menu, Notifications, Search } from "@/components/global/icons"
 
 const dropdownLinks = [
  { label: "Profile", href: "/" },
@@ -29,10 +29,13 @@ const containerVariants = {
 
 export default function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
  const [dropdownOpen, setDropdownOpen] = useState(false)
+ const [searchOpen, setSearchOpen] = useState(false)
 
  const dropdownRef = useRef<HTMLDivElement>(null)
+ const inputRef = useRef<HTMLInputElement>(null)
 
  const toggleDropdown = () => setDropdownOpen(!dropdownOpen)
+ const toggleSearch = () => setSearchOpen(!searchOpen)
 
  useEffect(() => {
   const handleClick = (e: MouseEvent) => {
@@ -47,6 +50,15 @@ export default function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
   document.addEventListener("mousedown", handleClick)
   return () => document.removeEventListener("mousedown", handleClick)
  }, [])
+ 
+ useEffect(() => {
+  if (
+   searchOpen &&
+   inputRef.current
+  ) {
+   inputRef.current.focus()
+  }
+ }, [searchOpen])
 
  return (
   <motion.div
@@ -55,7 +67,7 @@ export default function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
    variants={containerVariants}
   >
    <div className="flex items-center justify-center gap-4 lg:px-5 px-4 py-2">
-    <div className="flex items-center gap-2 flex-1">
+    <div className="flex items-center gap-2 lg:flex-1">
      <button
       onClick={onMenuClick}
       aria-label="Toggle navrail"
@@ -63,7 +75,7 @@ export default function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
      >
       <Menu />
      </button>
-     <Link href={"/"} className="flex items-center gap-2">
+     <Link href={"/"} className="flex items-center gap-2 shrink-0">
       <Image
        src="/shield-logo.png"
        alt="UT Health San Antonio logo"
@@ -75,8 +87,32 @@ export default function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
       <span className="text-slate-700 hidden lg:block">UT Health San Antonio</span>
      </Link>
     </div>
-    <div></div>
+    <div className="hidden lg:flex max-w-lg w-full relative">
+     <input
+      type="text"
+      placeholder="Search"
+      className="w-full border border-slate-200 rounded-md px-4 pl-10 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500"
+     />
+     <Search className="text-slate-500 absolute inset-y-[9px] left-2 pointer-events-none" />
+    </div>
     <div className="flex items-center justify-end gap-4 flex-1">
+     <div className="flex items-center justify-center gap-2 w-full lg:hidden">
+      <input
+       type="text"
+       placeholder="Search"
+       ref={inputRef}
+       className={`transition-all duration-300 ease-in-out border border-slate-200 rounded-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-slate-500 ${
+        searchOpen ? "w-full opacity-100" : "w-0 opacity-0"
+       }`}
+      />
+      <button
+       onClick={toggleSearch}
+       aria-label="Toggle search bar"
+       className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer"
+      >
+       <Search />
+      </button>
+     </div>
      <button aria-label="Toggle notifications" className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer hidden lg:flex relative">
       <Notifications />
       <span className="flex items-center justify-center text-white text-xs w-4 h-4 bg-orange-700 absolute top-0 right-0 rounded-full">3</span>
@@ -85,7 +121,7 @@ export default function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
       <button
        onClick={toggleDropdown}
        aria-label="Toggle dropdown"
-       className="rounded-full cursor-pointer"
+       className="rounded-full cursor-pointer shrink-0"
       >
        <Image
         src="/avatar.png"
