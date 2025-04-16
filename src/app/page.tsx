@@ -5,7 +5,7 @@ import Link from "next/link"
 import Navbar from "@/components/channel/navbar"
 import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { whatsNew, mostPopular, recommended, professionalDevelopment } from "@/data"
+import { shows, Show } from "@/data/data"
 import { ChevronDown, Filter, More, Sort } from "@/components/global/icons"
 
 const containerVariants = {
@@ -23,41 +23,45 @@ const containerVariants = {
  }
 }
 
-const sections = [
- { label: "What's New", key: "whatsNew", content: whatsNew },
- { label: "Most Popular", key: "mostPopular", content: mostPopular },
- { label: "Recommended", key: "recommended", content: recommended },
- { label: "Professional Development", key: "professionalDeveloment", content: professionalDevelopment }
-]
-
 const chunkSize = 4
+
+type ShowsByCategory = Record<string, Show[]>
+
+function groupShowsByCategory(shows: Show[]): ShowsByCategory {
+ const map: ShowsByCategory = {}
+
+ for (const show of shows) {
+  show.categories.forEach((category) => {
+   if (!map[category]) map[category] = []
+   map[category].push(show)
+  })
+ }
+
+ return map
+}
 
 export default function Home() {
  const [image, setImage] = useState("/banner-desktop.png")
- 
+ const showsByCategory = groupShowsByCategory(shows)
+
  const [visibleMap, setVisibleMap] = useState<Record<string, number>>(
-  Object.fromEntries(sections.map((s) => [s.key, chunkSize]))
+  Object.keys(showsByCategory).reduce((acc, cat) => {
+   acc[cat] = 4
+   return acc
+  }, {} as Record<string, number>)
  )
 
- const [lastRevealStart, setLastRevealStart] = useState<Record<string, number>>(
-  Object.fromEntries(sections.map((s) => [s.key, 0]))
- )
-
- const handleLoadMore = (key: string, total: number) => {
+ const handleShowMore = (category: string) => {
   setVisibleMap((prev) => ({
    ...prev,
-   [key]: Math.min(prev[key] + chunkSize, total)
-  }))
-
-  setLastRevealStart((prev) => ({
-   ...prev,
-   [key]: visibleMap[key]
+   [category]: prev[category] + 4
   }))
  }
 
  useEffect(() => {
   const updateImage = () => {
    const width = window.innerWidth
+
    if (width < 640) {
     setImage("/banner-mobile.png")
    } else if (width < 1024) {
@@ -68,6 +72,7 @@ export default function Home() {
   }
 
   updateImage()
+
   window.addEventListener("resize", updateImage)
   return () => window.removeEventListener("resize", updateImage)
  }, [])
@@ -98,62 +103,58 @@ export default function Home() {
       className="absolute -bottom-10 left-20 border border-white rounded-full shadow-md hidden md:block"
      />
     </div>
-    <ul className="hidden md:flex items-center gap-2 px-4 py-2">
-     <li>
-      <button aria-label="Sort" className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer">
-       <Sort />
-      </button>
-     </li>
-     <li>
-      <button aria-label="Filter" className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer">
-       <Filter />
-      </button>
-     </li>
-     <li>
-      <button aria-label="More" className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer">
-       <More />
-      </button>
-     </li>
-    </ul>
+    <div className="hidden md:flex items-center gap-2 px-4 py-2">
+     <button aria-label="Sort" className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer">
+      <Sort />
+     </button>
+     <button aria-label="Filter" className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer">
+      <Filter />
+     </button>
+     <button aria-label="More" className="text-slate-700 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer">
+      <More />
+     </button>
+    </div>
    </motion.header>
    <main className="p-4">
-    {sections.map((section) => {
-     const visibleCount = visibleMap[section.key]
-     const lastStart = lastRevealStart[section.key]
-     const visibleItems = section.content.slice(0, visibleCount)
-     const total = section.content.length
+    {Object.entries(showsByCategory).map(([category, shows]) => {
+     const visible = visibleMap[category] ?? 4
+     const showLoadMore = visible < shows.length
 
      return (
       <motion.section
-       key={section.key}
+       key={category}
        initial="hidden"
        animate="visible"
        variants={containerVariants}
        className="flex flex-col gap-4 mb-8"
       >
        <h2 className="flex items-center gap-2 text-slate-700">
-        <span className="flex w-12 h-[2px] bg-orange-700 rounded-full" />
-        {section.label}
+        <span className="w-12 h-[2px] bg-orange-700 rounded-full" />
+        {category}
        </h2>
        <ul className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 gap-y-8 mb-4">
         <AnimatePresence initial={false}>
-         {visibleItems.map((item, i) => {
-          const isNew = i >= lastStart && i < lastStart + chunkSize
-          const Card = (
-           <Link href={item.href} className="flex flex-col gap-2 lg:hover:scale-105 hover:scale-102 transform duration-150">
+         {shows.slice(0, visible).map((show) => (
+          <motion.li
+           key={show.id}
+           initial="hidden"
+           animate="visible"
+           variants={containerVariants}
+          >
+           <Link href={`/show/${show.id}`} className="flex flex-col gap-2 group lg:hover:scale-105 hover:scale-102 transform duration-150">
             <div className="relative">
              <Image
-              src={item.image}
-              alt={item.title}
+              src={show.thumbnail}
+              alt={show.title}
               width={800}
               height={250}
               className="rounded-md"
              />
-             <span className="absolute bottom-2 right-2 bg-black/70 text-white/90 text-xs text-center font-medium px-1 py-[2px] rounded-sm">{item.duration}</span>
+             <span className="absolute bottom-2 right-2 bg-black/70 text-white/90 text-xs text-center font-medium px-1 py-[2px] rounded-sm">{show.duration}</span>
             </div>
             <div className="flex flex-col">
              <div className="flex items-start justify-between gap-4 mb-1">
-              <h3 className="text-slate-700 text-base/5 font-medium line-clamp-2">{item.title}</h3>
+              <h3 className="text-slate-700 text-base/5 font-medium line-clamp-2">{show.title}</h3>
               <button aria-label="More" className="text-slate-700 rounded-full hover:bg-slate-100 transition cursor-pointer">
                <More />
               </button>
@@ -161,40 +162,27 @@ export default function Home() {
              <p className="text-slate-500 text-sm">1.1k views | 5 days ago</p>
             </div>
            </Link>
-          )
-
-          return isNew ? (
-           <motion.li
-            key={i}
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
-           >
-            {Card}
-           </motion.li>
-          ) : (
-           <li key={i}>{Card}</li>
-          )
-         })}
+          </motion.li>
+         ))}
         </AnimatePresence>
        </ul>
-       {visibleCount < total && (
+       {showLoadMore && (
         <motion.div
          initial="hidden"
          animate="visible"
          variants={containerVariants}
          className="flex items-center justify-center"
         >
-         <span className="flex w-full h-[1px] bg-slate-200" />
+         <span className="w-full h-[1px] bg-slate-200" />
          <button
-          onClick={() => handleLoadMore(section.key, total)}
-          aria-label={`Show more ${section.label}`}
+          onClick={() => handleShowMore(category)}
+          aria-label={`Show more ${category}`}
           className="flex items-center justify-center gap-1 w-3xl border border-slate-200 rounded-full transition cursor-pointer text-slate-700 py-2 hover:bg-slate-100"
          >
           Show more
           <ChevronDown />
          </button>
-         <span className="flex w-full h-[1px] bg-slate-200" />
+         <span className="w-full h-[1px] bg-slate-200" />
         </motion.div>
        )}
       </motion.section>

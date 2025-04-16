@@ -13,7 +13,7 @@ const mulish = Mulish({
  subsets: [ "latin" ]
 })
 
-export default function RootLayout({
+export default function AdminLayout({
  children
 }: Readonly<{
  children: ReactNode
@@ -21,18 +21,16 @@ export default function RootLayout({
  const [navExpanded, setNavExpanded] = useState(true)
 
  return (
-  <html lang="en">
-   <body className={`${mulish.variable} antialiased`}>
-    <Navbar onMenuClick={() => setNavExpanded((prev) => !prev)} />
-    <div className="flex flex-1 overflow-hidden pb-12 lg:pb-0">
-     <Navrail expanded={navExpanded} />
-     <main className="flex-1 overflow-auto">
-      <Header />
-      {children}
-     </main>
-    </div>
-    <BottomAppBar />
-   </body>
-  </html>
+  <>
+   <Navbar onMenuClick={() => setNavExpanded((prev) => !prev)} />
+   <div className="flex flex-1 overflow-hidden pb-12 lg:pb-0">
+    <Navrail expanded={navExpanded} />
+    <main className="flex-1 overflow-auto">
+     <Header />
+     {children}
+    </main>
+   </div>
+   <BottomAppBar />
+  </>
  )
 }
