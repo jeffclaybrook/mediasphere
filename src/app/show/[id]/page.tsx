@@ -1,13 +1,14 @@
 import { notFound } from "next/navigation"
 import { shows } from "@/data/data"
 import Navbar from "@/components/channel/navbar"
-import Player from "../(components)/player"
 import Slides from "../(components)/slides"
 import Tabs from "../(components)/tabs"
+import VideoDetails from "../(components)/video-details"
+import VideoPlayer from "../(components)/video-player"
 
-export default async function ShowPage({ params }: { params: Promise<{ id: string }>}) {
+export default async function Show({ params }: { params: Promise<{ id: string }>}) {
  const { id } = await params
- const show = shows.find((s) => s.id === id)
+ const show = shows.find((show) => show.id === id)
 
  if (!show) return notFound()
 
@@ -17,20 +18,24 @@ export default async function ShowPage({ params }: { params: Promise<{ id: strin
    <main className="px-4">
     <section className="pb-8">
      <div className="grid lg:grid-cols-12 gap-4">
-      <Player
-       src={show.video}
-       chapters={show.chapters}
-       captions={show.captions}
-       title={show.title}
-       description={show.description}
-       tags={show.tags}
-      />
+      <div className="flex flex-col lg:col-span-7 gap-4 mb-4">
+       <VideoPlayer
+        src={show.video}
+        chapters={show.chapters}
+        captions={show.captions}
+       />
+       <VideoDetails
+        title={show.title}
+        description={show.description}
+        tags={show.tags}
+       />
+      </div>
       <Slides
        slides={show.slides}
        alt={show.title}
       />
-      <Tabs />
      </div>
+     <Tabs />
     </section>
    </main>
   </>

@@ -30,7 +30,7 @@ export default function Tabs() {
  const [activeTab, setActiveTab] = useState(0)
 
  return (
-  <div className="flex flex-col col-span-12">
+  <div className="flex flex-col w-full">
    <div className="flex items-center border-b border-slate-200">
     {tabs.map((tab, i) => (
      <button
